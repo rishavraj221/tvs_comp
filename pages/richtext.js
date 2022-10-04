@@ -10,7 +10,13 @@ import jwtDecode from "jwt-decode";
 import CssBaseline from "@mui/material/CssBaseline";
 
 import useWindowDimensions from "../hooks/useWindowDimensions";
-import { htmlToPdf, saveToS3, getPdf, updatePdf } from "../api/prod";
+import {
+  htmlToPdf,
+  saveToS3,
+  getPdf,
+  updatePdf,
+  updateNEPdf,
+} from "../api/prod";
 import "react-quill/dist/quill.snow.css";
 import styles from "../styles/Home.module.css";
 
@@ -76,6 +82,9 @@ export default function Home() {
   const [rteContent, setRTEContent] = useState(null);
   const [fileName, setFilename] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [saveBtnDisable, setSaveBtnDisable] = useState(false);
+  const [neloading, setNEloading] = useState(false);
+  const [neBtnDisable, setNEBtnDisable] = useState(false);
 
   useEffect(() => {
     if (query && query["temp_name"]) setFilename(query["temp_name"]);
@@ -88,45 +97,46 @@ export default function Home() {
     // setPdfSrc(res.body);
   };
 
-  const pdfLink = (arrayBuffer) => {
-    const blob = new Blob([new Uint8Array(arrayBuffer).buffer], {
-      type: "application/pdf",
-    });
-    const link =
-      typeof window !== "undefined" && window.URL.createObjectURL(blob);
-    console.log(link);
-    return link;
-  };
-
   const onSave = async (content) => {
     setLoading(true);
-    const pdfBuffer = await htmlToPdf(content);
-    const arrayBuffer = JSON.parse(pdfBuffer["body"])["data"];
 
-    const res = await saveToS3(fileName, arrayBuffer);
-    console.log(res);
+    const pdfID = query["pdfID"] || "";
 
-    const pdfID = query && query["pdfID"] ? query["pdfID"] : "";
-
-    const res2 = await updatePdf(
-      pdfID,
-      decodedToken["id"],
-      fileName,
-      "",
-      JSON.stringify(res["body"]),
-      true
-    );
+    const res2 = await updatePdf(pdfID, decodedToken["id"], fileName, content);
 
     router.push({
       pathname: "/richtext",
       query: {
         pdfID: res2["body"]["pdfID"],
-        temp_data: query["temp_data"],
-        temp_name: query["temp_name"],
+        temp_data: content,
+        temp_name: fileName,
       },
     });
 
+    setSaveBtnDisable(true);
+
     setLoading(false);
+  };
+
+  const onAskApproval = async (content) => {
+    setNEloading(true);
+    const pdfBuffer = await htmlToPdf(content);
+    const arrayBuffer = JSON.parse(pdfBuffer["body"])["data"];
+
+    const res = await saveToS3(fileName, arrayBuffer);
+
+    const res2 = await updateNEPdf(
+      res["body"]["key"],
+      decodedToken["id"],
+      fileName,
+      JSON.stringify(res["body"]),
+      "pending"
+    );
+
+    setNEBtnDisable(true);
+    alert("Asked for approval!");
+
+    setNEloading(false);
   };
 
   const getPdfFunc = async () => {
@@ -179,7 +189,11 @@ export default function Home() {
                   id="outlined-basic"
                   size="small"
                   value={fileName}
-                  onChange={(e) => setFilename(e.target.value)}
+                  onChange={(e) => {
+                    setFilename(e.target.value);
+                    setNEBtnDisable(false);
+                    setSaveBtnDisable(false);
+                  }}
                   variant="outlined"
                 />
               </div>
@@ -192,6 +206,7 @@ export default function Home() {
                 ) : (
                   <Button
                     variant="contained"
+                    disabled={saveBtnDisable}
                     onClick={() => onSave(rteContent)}
                   >
                     Save
@@ -199,7 +214,17 @@ export default function Home() {
                 )}
               </div>
               <div className={styles.rteHeadSS}>
-                <Button variant="contained">Ask for Approval</Button>
+                {neloading ? (
+                  <div>Asking...</div>
+                ) : (
+                  <Button
+                    variant="contained"
+                    disabled={neBtnDisable}
+                    onClick={() => onAskApproval(rteContent)}
+                  >
+                    Ask for Approval
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -212,12 +237,11 @@ export default function Home() {
               theme="snow"
               onChange={(content) => {
                 setRTEContent(content);
-                console.log(content);
+                setNEBtnDisable(false);
+                setSaveBtnDisable(false);
               }}
             />
           </div>
-
-          {/* <iframe src={pdfLink(pdfData.data)} width={500} height={500} /> */}
         </ThemeProvider>
       </main>
 

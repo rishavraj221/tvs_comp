@@ -8,6 +8,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Button from "@mui/material/Button";
 
 import useWindowDimensions from "../hooks/useWindowDimensions";
+import { scanNEPdfs } from "../api/prod";
 import styles from "../styles/Home.module.css";
 
 const theme = createTheme({
@@ -23,6 +24,24 @@ const Home = () => {
   const [pendingLetters, setPendingLetters] = useState([]);
   const [approvedLetters, setApprovedLetters] = useState([]);
   const [rejectedLetters, setRejectedLetters] = useState([]);
+
+  const getAllPDFsFunc = async () => {
+    const res = await scanNEPdfs();
+    const temp_pdfs = JSON.parse(res["body"])["Items"];
+    setPendingLetters(
+      temp_pdfs.filter((t) => t["approval"]["S"] === "pending")
+    );
+    setApprovedLetters(
+      temp_pdfs.filter((t) => t["approval"]["S"] === "approved")
+    );
+    setRejectedLetters(
+      temp_pdfs.filter((t) => t["approval"]["S"] === "rejected")
+    );
+  };
+
+  useEffect(() => {
+    getAllPDFsFunc();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -65,10 +84,23 @@ const Home = () => {
               <div className={styles.listOCOuter}>
                 {pendingLetters.length > 0 ? (
                   <div className={styles.listOCInner}>
-                    {templates_data.map((td, i) => (
-                      <div key={i} className={styles.createNewCard}>
+                    {pendingLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        style={{ backgroundColor: "#f9aa33" }}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/nepdf",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              approval: td["approval"]["S"],
+                            },
+                          })
+                        }
+                      >
                         <div className={styles.cardTitle}>
-                          {td["temp_name"]}
+                          {td["fileName"]["S"]}
                         </div>
                       </div>
                     ))}
@@ -86,10 +118,23 @@ const Home = () => {
               <div className={styles.listOCOuter}>
                 {approvedLetters.length > 0 ? (
                   <div className={styles.listOCInner}>
-                    {templates_data.map((td, i) => (
-                      <div key={i} className={styles.createNewCard}>
+                    {approvedLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        style={{ backgroundColor: "#03DAC5" }}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/nepdf",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              approval: td["approval"]["S"],
+                            },
+                          })
+                        }
+                      >
                         <div className={styles.cardTitle}>
-                          {td["temp_name"]}
+                          {td["fileName"]["S"]}
                         </div>
                       </div>
                     ))}
@@ -107,10 +152,26 @@ const Home = () => {
               <div className={styles.listOCOuter}>
                 {rejectedLetters.length > 0 ? (
                   <div className={styles.listOCInner}>
-                    {templates_data.map((td, i) => (
-                      <div key={i} className={styles.createNewCard}>
-                        <div className={styles.cardTitle}>
-                          {td["temp_name"]}
+                    {rejectedLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        style={{ backgroundColor: "#e30425" }}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/nepdf",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              approval: td["approval"]["S"],
+                            },
+                          })
+                        }
+                      >
+                        <div
+                          className={styles.cardTitle}
+                          style={{ color: "white" }}
+                        >
+                          {td["fileName"]["S"]}
                         </div>
                       </div>
                     ))}

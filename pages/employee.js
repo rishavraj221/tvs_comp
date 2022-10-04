@@ -8,7 +8,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import Button from "@mui/material/Button";
 
 import useWindowDimensions from "../hooks/useWindowDimensions";
-import { scanAllPdfs } from "../api/prod";
+import { scanSavedPdfs, scanNEPdfs } from "../api/prod";
 import styles from "../styles/Home.module.css";
 
 const theme = createTheme({
@@ -44,20 +44,26 @@ const Home = () => {
   const { width, height } = useWindowDimensions();
   const router = useRouter();
 
+  const [pendingLetters, setPendingLetters] = useState([]);
   const [approvedLetters, setApprovedLetters] = useState([]);
   const [savedLetters, setSavedLetters] = useState([]);
   const [rejectedLetters, setRejectedLetters] = useState([]);
 
   const getAllPDFsFunc = async () => {
-    const res = await scanAllPdfs();
+    const res = await scanSavedPdfs();
     const temp_pdfs = JSON.parse(res["body"])["Items"];
+    setSavedLetters(temp_pdfs);
 
-    setApprovedLetters(
-      temp_pdfs.filter((t) => t["approval"]["S"] === "approved")
+    const res2 = await scanNEPdfs();
+    const temp2_pdfs = JSON.parse(res2["body"])["Items"];
+    setPendingLetters(
+      temp2_pdfs.filter((t) => t["approval"]["S"] === "pending")
     );
-    setSavedLetters(temp_pdfs.filter((t) => t["saved"]["BOOL"]));
+    setApprovedLetters(
+      temp2_pdfs.filter((t) => t["approval"]["S"] === "approved")
+    );
     setRejectedLetters(
-      temp_pdfs.filter((t) => t["approval"]["S"] === "rejected")
+      temp2_pdfs.filter((t) => t["approval"]["S"] === "rejected")
     );
   };
 
@@ -105,7 +111,14 @@ const Home = () => {
             <div className={styles.listOfCards}>
               <div className={styles.listOCOuter}>
                 <div className={styles.listOCInner}>
-                  <div className={styles.createNewCard}>
+                  <div
+                    className={styles.createNewCard}
+                    onClick={() =>
+                      router.push({
+                        pathname: "/richtext",
+                      })
+                    }
+                  >
                     <div className={styles.cardIcon}>
                       <Image
                         src="/icons/plus.svg" // Route of the image file
@@ -140,15 +153,28 @@ const Home = () => {
           </div>
 
           <div className={styles.empCont}>
-            <div className={styles.empTitle}>Approved Letters</div>
+            <div className={styles.empTitle}>Drafts</div>
             <div className={styles.listOfCards}>
               <div className={styles.listOCOuter}>
-                {approvedLetters.length > 0 ? (
+                {savedLetters.length > 0 ? (
                   <div className={styles.listOCInner}>
-                    {templates_data.map((td, i) => (
-                      <div key={i} className={styles.createNewCard}>
+                    {savedLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/richtext",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              temp_data: td["content"]["S"],
+                              temp_name: td["fileName"]["S"],
+                            },
+                          })
+                        }
+                      >
                         <div className={styles.cardTitle}>
-                          {td["temp_name"]}
+                          {td["fileName"]["S"]}
                         </div>
                       </div>
                     ))}
@@ -161,15 +187,62 @@ const Home = () => {
           </div>
 
           <div className={styles.empCont}>
-            <div className={styles.empTitle}>Saved Letters</div>
+            <div className={styles.empTitle}>Pending For Approval</div>
             <div className={styles.listOfCards}>
               <div className={styles.listOCOuter}>
-                {savedLetters.length > 0 ? (
+                {pendingLetters.length > 0 ? (
                   <div className={styles.listOCInner}>
-                    {templates_data.map((td, i) => (
-                      <div key={i} className={styles.createNewCard}>
+                    {pendingLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        style={{ backgroundColor: "#f9aa33" }}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/nepdf",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              approval: td["approval"]["S"],
+                            },
+                          })
+                        }
+                      >
                         <div className={styles.cardTitle}>
-                          {td["temp_name"]}
+                          {td["fileName"]["S"]}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className={styles.noData}>Empty List!</div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.empCont}>
+            <div className={styles.empTitle}>Approved Letters</div>
+            <div className={styles.listOfCards}>
+              <div className={styles.listOCOuter}>
+                {approvedLetters.length > 0 ? (
+                  <div className={styles.listOCInner}>
+                    {approvedLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        style={{ backgroundColor: "#03DAC5" }}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/nepdf",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              approval: td["approval"]["S"],
+                            },
+                          })
+                        }
+                      >
+                        <div className={styles.cardTitle}>
+                          {td["fileName"]["S"]}
                         </div>
                       </div>
                     ))}
@@ -187,10 +260,26 @@ const Home = () => {
               <div className={styles.listOCOuter}>
                 {rejectedLetters.length > 0 ? (
                   <div className={styles.listOCInner}>
-                    {templates_data.map((td, i) => (
-                      <div key={i} className={styles.createNewCard}>
-                        <div className={styles.cardTitle}>
-                          {td["temp_name"]}
+                    {rejectedLetters.map((td, i) => (
+                      <div
+                        key={i}
+                        className={styles.createNewCard}
+                        style={{ backgroundColor: "#e30425" }}
+                        onClick={() =>
+                          router.push({
+                            pathname: "/nepdf",
+                            query: {
+                              pdfID: td["id"]["S"],
+                              approval: td["approval"]["S"],
+                            },
+                          })
+                        }
+                      >
+                        <div
+                          className={styles.cardTitle}
+                          style={{ color: "white" }}
+                        >
+                          {td["fileName"]["S"]}
                         </div>
                       </div>
                     ))}

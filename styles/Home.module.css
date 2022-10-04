@@ -233,11 +233,11 @@
   text-align: center;
   color: rgb(65, 65, 65);
   font-weight: 500;
+  padding: 10px;
 }
 
 .listOfCards {
   overflow-x: auto;
-  white-space: nowrap;
 }
 
 .listOCOuter {
