@@ -1,0 +1,307 @@
+.container {
+  padding: 0 2rem;
+}
+
+.main {
+  min-height: 100vh;
+  padding: 4rem 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  display: flex;
+  flex: 1;
+  padding: 2rem 0;
+  border-top: 1px solid #eaeaea;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.title a {
+  color: #0070f3;
+  text-decoration: none;
+}
+
+.title a:hover,
+.title a:focus,
+.title a:active {
+  text-decoration: underline;
+}
+
+.title {
+  margin: 0;
+  line-height: 1.15;
+  font-size: 50px;
+  /* font-family: "Cookie"; */
+  display: flex;
+  align-items: center;
+}
+
+.title,
+.description {
+  text-align: center;
+}
+
+.description {
+  margin: 4rem 0;
+  line-height: 1.5;
+  font-size: 1.5rem;
+}
+
+.code {
+  background: #fafafa;
+  border-radius: 5px;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+    Bitstream Vera Sans Mono, Courier New, monospace;
+}
+
+.grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  max-width: 800px;
+}
+
+.card {
+  margin: 1rem;
+  padding: 1.5rem;
+  text-align: left;
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  max-width: 300px;
+}
+
+.card:hover,
+.card:focus,
+.card:active {
+  color: #0070f3;
+  border-color: #0070f3;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+  font-size: 1.5rem;
+}
+
+.card p {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+
+.logo {
+  position: absolute;
+  top: 10px;
+  left: 20px;
+}
+
+.empInfo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+.empDropdownContent {
+  display: none;
+  position: absolute;
+  background-color: #5b5b5b;
+  min-width: 100px;
+  right: 0;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.empDDList {
+  color: white;
+  font-size: 16px;
+  padding: 10px 20px;
+  font-weight: 500;
+}
+.empDDList:hover {
+  background-color: #858585;
+  cursor: pointer;
+}
+
+.empInfo:hover .empDropdownContent {
+  display: block;
+}
+
+/* .formCont {
+  width: 100%;
+  padding: 40px;
+} */
+
+.formTitle {
+  font-size: large;
+  margin: 30px 0;
+  color: rgb(208, 208, 208);
+  font-weight: 600;
+}
+
+.textField {
+  margin: 15px 0;
+}
+
+.homeCont {
+  display: flex;
+  width: 70%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rteCont {
+  background-color: white;
+  padding: 20px;
+  width: 80%;
+  color: black;
+  color-scheme: light;
+  border-radius: 10px;
+}
+
+.formTabs {
+  display: flex;
+  align-items: center;
+  width: 200px;
+  justify-content: space-between;
+}
+
+.selectedTab {
+  font-size: 18px;
+  font-weight: 600;
+  background-color: #6938d3;
+  padding: 10px 25px;
+  border-radius: 50px;
+}
+.selectedTab:hover {
+  cursor: pointer;
+}
+
+.unSelectedTab {
+  font-size: 18px;
+  font-weight: 600;
+  padding: 10px 25px;
+}
+.unSelectedTab:hover {
+  cursor: pointer;
+}
+
+.empCont {
+  width: 90%;
+}
+
+.empTitle {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 40px 0 0;
+}
+
+.createNewCard {
+  background-color: #dbdbdb;
+  border-radius: 10px;
+  width: 180px;
+  height: 160px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  margin: 20px;
+}
+.createNewCard:hover {
+  cursor: pointer;
+  box-shadow: 4px 4px 4px 0px rgba(255, 255, 255, 0.25);
+}
+
+.cardTitle {
+  text-align: center;
+  color: rgb(65, 65, 65);
+  font-weight: 500;
+}
+
+.listOfCards {
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.listOCOuter {
+  display: inline-block;
+  min-width: 100%;
+}
+
+.listOCInner {
+  display: flex;
+}
+
+.noData {
+  margin: 50px auto;
+  text-align: center;
+}
+
+.empIcon {
+  padding: 10px 20px;
+  border-radius: 50px;
+  background-color: rgb(254, 254, 254);
+  color: rgb(65, 65, 65);
+  font-size: 25px;
+  font-weight: 600;
+}
+
+.rteHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+  margin: 25px 0;
+}
+
+.rteHeadS {
+  display: flex;
+  align-items: center;
+}
+
+.rteHeadSS {
+  margin-left: 15px;
+}
+
+@media (max-width: 600px) {
+  .grid {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .vidContainer {
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 100px;
+  }
+}
+
+/* @media (prefers-color-scheme: dark) {
+  .card,
+  .footer {
+    border-color: #222;
+  }
+  .code {
+    background: #111;
+  }
+  .logo img {
+    filter: invert(1);
+  }
+} */
